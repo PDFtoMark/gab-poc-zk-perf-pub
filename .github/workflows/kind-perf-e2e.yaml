@@ -11,15 +11,16 @@ jobs:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     permissions:
       issues: write
-    runs-on: ubuntu-latest
-    steps:
-      - name: Debug workflow_run trigger
-        run: |
-          echo "Event name: ${{ github.event_name }}"
-          echo "Workflow run conclusion: ${{ github.event.workflow_run.conclusion }}"
-          echo "Workflow run name: ${{ github.event.workflow_run.name }}"
-      - name: Env poisoning proof
-        if: always()
-        run: |
-          echo "GABENV=$GABENV"
-          jq -c '{name:.workflow_run.name, event:.workflow_run.event, head_branch:.workflow_run.head_branch, head_repo:.workflow_run.head_repository.full_name}' "$GITHUB_EVENT_PATH"
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - name: "Drift Performance"
+            focus: "Drift Performance"
+          - name: "Basic Scale Test"
+            focus: "Basic Deployment"
+    uses: ./.github/workflows/e2e.yaml
+    with:
+      suite: Performance
+      focus: ${{ matrix.test.focus }}
+      test_name: ${{ matrix.test.name }}
