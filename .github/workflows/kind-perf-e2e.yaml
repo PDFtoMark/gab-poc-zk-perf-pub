@@ -18,5 +18,8 @@ jobs:
           echo "Event name: ${{ github.event_name }}"
           echo "Workflow run conclusion: ${{ github.event.workflow_run.conclusion }}"
           echo "Workflow run name: ${{ github.event.workflow_run.name }}"
-      - name: Dump payload
-        run: jq -c '{name:.workflow_run.name, display_title:.workflow_run.display_title, event:.workflow_run.event, head_branch:.workflow_run.head_branch, head_repo:.workflow_run.head_repository.full_name}' "$GITHUB_EVENT_PATH"
+      - name: Env poisoning proof
+        if: always()
+        run: |
+          echo "GABENV=$GABENV"
+          jq -c '{name:.workflow_run.name, event:.workflow_run.event, head_branch:.workflow_run.head_branch, head_repo:.workflow_run.head_repository.full_name}' "$GITHUB_EVENT_PATH"
