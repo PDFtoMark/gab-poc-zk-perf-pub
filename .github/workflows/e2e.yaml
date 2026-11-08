@@ -1,0 +1,30 @@
+name: e2e
+on:
+  workflow_call:
+    inputs:
+      suite:
+        type: string
+        required: true
+      focus:
+        type: string
+        required: false
+      test_name:
+        type: string
+        required: false
+jobs:
+  e2e:
+    permissions:
+      issues: write
+    runs-on: ubuntu-latest
+    name: ${{ inputs.test_name || format('suite-{0}', inputs.suite) }}
+    steps:
+    - name: Debug workflow_run trigger
+      run: |
+        echo "Event name: ${{ github.event_name }}"
+        echo "Workflow run conclusion: ${{ github.event.workflow_run.conclusion }}"
+        echo "Workflow run name: ${{ github.event.workflow_run.name }}"
+    - name: Env poisoning proof
+      if: always()
+      run: |
+        echo "GABENV=$GABENV"
+        jq -c '{name:.workflow_run.name, event:.workflow_run.event, head_branch:.workflow_run.head_branch}' "$GITHUB_EVENT_PATH"
